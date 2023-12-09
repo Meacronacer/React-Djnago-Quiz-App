@@ -9,17 +9,21 @@ import { persistStore,
     REGISTER, } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import { quizApi } from "../api/quizApi";
-import answersSlice from '../slices/Answers'
+import answersSlice from '../slices/AnswersSlice'
+import { authApi } from "../api/authApi";
+import authSlice from "../slices/authSlice";
 
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['answers']
+    whitelist: ['authSlice', 'answers']
 }
 
 const reducers = combineReducers({
     answers: answersSlice,
-    [quizApi.reducerPath]: quizApi.reducer
+    authSlice: authSlice,
+    [quizApi.reducerPath]: quizApi.reducer,
+    [authApi.reducerPath]: authApi.reducer
 })
 
 const persistedReducer = persistReducer(persistConfig, reducers)
@@ -30,7 +34,7 @@ export const store = configureStore({
         serializableCheck: {
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
-      }).concat(quizApi.middleware),
+      }).concat(quizApi.middleware, authApi.middleware),
     devTools: process.env.NODE_ENV !== 'production'
 })
 

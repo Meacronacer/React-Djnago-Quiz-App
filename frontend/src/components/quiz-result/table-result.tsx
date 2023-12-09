@@ -1,6 +1,7 @@
 import React from 'react'
 import { Tabs, Tab, Typography, Box } from '@mui/material/'
-import { useAppSelector } from '../../hooks/reduxHooks';
+import { useAppSelector, useAppDispatch } from '../../hooks/reduxHooks';
+import { changeScore } from '../../Redux/slices/AnswersSlice';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -57,12 +58,13 @@ const BasicTabs = ({data}: any) => {
     setValue(newValue);
   };
 
-  const tabHeader = data.map((_:void, index:any) => {
+
+  const tabHeader = data.map((_:void, index:number) => {
         return <Tab key={index} label={index+1} {...a11yProps(index+1)} />
   })
 
-  const tabContent = data.map((item:any, index:any) => {
-        const items = item.answers.map((item:any, index2:any) => {
+  const tabContent = data.map((item:any, index:number) => {
+        const items = item.answers.map((item:any, index2:number) => {
             const color = checkAnswers(item[index2], item['correct'], userAnswers[index])
             return <Typography color='white'
                 variant="h5"
@@ -72,7 +74,8 @@ const BasicTabs = ({data}: any) => {
                     ['green','red'].includes(color) && 'Your Answer'
                 }</Typography> 
             </Typography>
-        })    
+        })
+
         return <CustomTabPanel key={index} answers={items} value={value} index={index}>
                     {item.question}
                </CustomTabPanel>

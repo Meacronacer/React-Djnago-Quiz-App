@@ -1,6 +1,8 @@
 from .models import *
 from rest_framework import serializers
-from django.core.serializers import serialize
+from django.contrib.auth.models import User
+from rest_framework.validators import UniqueValidator
+from django.contrib.auth.password_validation import validate_password
 
 class QuizSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()
@@ -21,3 +23,21 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ['id', 'quiz', 'question', 'score', 'answers']
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
+class QuizResultsSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+    source="user.username",
+    read_only=True, 
+    default=serializers.CurrentUserDefault()
+    )
+
+    class Meta: 
+        model = QuizResult
+        fields = '__all__'

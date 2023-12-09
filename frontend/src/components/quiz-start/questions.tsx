@@ -5,12 +5,13 @@ interface Question {
     currentIq: number;
     maxIq: number;
     questions: any;
-    answers: object;
+    answers?: any;
     onNextQuestion: () => void;
 }
 
 
 const Questions = ({title, currentIq, maxIq, questions, answers, onNextQuestion}: Question) => {
+  
   return (
     <Card component="form" variant="outlined">
       <CardContent>

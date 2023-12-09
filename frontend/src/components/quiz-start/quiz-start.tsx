@@ -2,17 +2,17 @@ import { Container, Box, Checkbox, FormControlLabel, } from "@mui/material";
 import { useParams } from 'react-router-dom'
 import { useState } from 'react'
 import { useGetQuizQuestionsQuery } from "../../Redux/api/quizApi";
-import { addAnswer, nextQuestion } from "../../Redux/slices/Answers";
+import { addAnswer, nextQuestion, changeScore, changeMaxpoints} from "../../Redux/slices/AnswersSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import QuizResult from "../quiz-result/quiz-result";
 import Questions from "./questions";
 
 const QuizStart: React.FC = () => {
     const { quizSlug } = useParams()
-    const [answers, setAnswers] = useState({})
+    const [answers, setAnswers] = useState<any>({})
     const [listState, setListState] = useState<any>({})
     const dispatch = useAppDispatch()
-    const { userAnswers, qIndex} = useAppSelector(state => state.answers)
+    const { qIndex,userAnswers } = useAppSelector(state => state.answers)
     const { data = [], isLoading } = useGetQuizQuestionsQuery(quizSlug) 
 
     if (isLoading) {
@@ -20,6 +20,8 @@ const QuizStart: React.FC = () => {
     }
 
     const onCheckBox = (e:any, index:any) => {
+      for (let i = 0; i < data[qIndex].answers.length; i++) {
+      }
       setListState({
         ...listState,
         [index]: e.target.checked
@@ -30,14 +32,28 @@ const QuizStart: React.FC = () => {
       })
     }
   
-    console.log(userAnswers)
-    console.log(qIndex)
     const onNextQuestion = () => {
+        let keys = Object.keys(answers).filter((item:any) => answers[item])
+        let findWrongUserAns = false
+
+        for (let i = 0; i < data[qIndex].answers.length; i++) {
+          // console.log(data[qIndex].answers[i], data[qIndex].answers[i][i])
+          if (keys.includes(data[qIndex].answers[i][i]) && !data[qIndex].answers[i]['correct']) {
+            findWrongUserAns = true
+            break
+          }
+        }
+
+        if (!findWrongUserAns) {
+          dispatch(changeScore(data[qIndex]['score'] * keys.length))
+        }
+        dispatch(changeMaxpoints(data[qIndex].answers.filter((item:any) => item.correct).length * data[qIndex]['score']))
         dispatch(addAnswer(answers))
         dispatch(nextQuestion())
         setAnswers({})
         setListState({})
     }
+
     
 
     const questions = data[qIndex]?.answers && data[qIndex].answers.map((item:any, index:any) => {
